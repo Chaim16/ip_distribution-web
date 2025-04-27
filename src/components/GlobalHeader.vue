@@ -25,15 +25,6 @@
           </a-menu-item>
         </a-menu>
       </div>
-      <div class="search-wrapper">
-        <a-input-search
-          v-model:value="searchKeyword"
-          placeholder="搜索"
-          style="width: 200px"
-          class="search-input"
-          @search="handleSearch"
-        />
-      </div>
     </div>
     <div class="header-right">
       <a-popconfirm

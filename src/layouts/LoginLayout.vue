@@ -1,7 +1,7 @@
 <template>
   <div class="login-layout">
     <header>
-      <h1>欢迎来到在线画稿交易中心</h1>
+      <h1>欢迎来到企业网络IP地址管理系统</h1>
     </header>
     <main>
       <router-view />
