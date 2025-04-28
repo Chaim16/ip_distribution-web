@@ -176,6 +176,15 @@ const api = {
     );
     return res.data;
   },
+  routerPortList: async (params: object) => {
+    const res = await axiosInstance.get(
+      "/distribution/api/v1/router_port/router_port_list/",
+      {
+        params,
+      }
+    );
+    return res.data;
+  },
 };
 
 export default api;

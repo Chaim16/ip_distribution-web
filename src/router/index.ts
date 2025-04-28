@@ -9,14 +9,12 @@ import {
 import UserRegister from "@/views/user/UserRegister.vue";
 import UserLogin from "@/views/user/UserLogin.vue";
 import HomeView from "@/views/HomeView.vue";
-import UserProfile from "@/views/user/UserProfile.vue";
-import PublishDraft from "@/views/PublishDraft.vue";
 import { ACCESS_ENUM } from "@/utils/constant";
-import DesignerApplication from "@/views/DesignerApplication.vue";
 import RouterList from "@/views/RouterList.vue";
 import UserManagement from "@/views/user/UserManagement.vue";
 import WorkstationList from "@/views/WorkstationList.vue";
 import SwitchList from "@/views/SwitchList.vue";
+import RouterPort from "@/views/RouterPort.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -36,6 +34,15 @@ const routes: Array<RouteRecordRaw> = [
       access: ACCESS_ENUM.ADMINISTRATOR,
     },
     component: RouterList,
+  },
+  {
+    path: "/router_port",
+    name: "端口列表",
+    component: RouterPort,
+    meta: {
+      hideInMenu: true,
+      access: ACCESS_ENUM.ADMINISTRATOR,
+    },
   },
   {
     path: "/switch",
