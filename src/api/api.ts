@@ -135,6 +135,47 @@ const api = {
     );
     return res.data;
   },
+  workstationList: async (params: object) => {
+    const res = await axiosInstance.get(
+      "/distribution/api/v1/workstation/workstation_list/",
+      {
+        params,
+      }
+    );
+    return res.data;
+  },
+  workstationDetail: async (params: object) => {
+    const res = await axiosInstance.get(
+      "/distribution/api/v1/workstation/workstation_detail/",
+      {
+        params,
+      }
+    );
+    return res.data;
+  },
+  createWorkstation: async (body: object) => {
+    const res = await axiosInstance.post(
+      "/distribution/api/v1/workstation/add/",
+      body
+    );
+    return res.data;
+  },
+  deleteWorkstation: async (body: object) => {
+    const res = await axiosInstance.post(
+      "/distribution/api/v1/workstation/del_workstation/",
+      body
+    );
+    return res.data;
+  },
+  switchList: async (params: object) => {
+    const res = await axiosInstance.get(
+      "/distribution/api/v1/switch/switch_list/",
+      {
+        params,
+      }
+    );
+    return res.data;
+  },
 };
 
 export default api;

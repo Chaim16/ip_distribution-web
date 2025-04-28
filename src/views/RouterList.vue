@@ -40,7 +40,7 @@
 
     <a-modal
       v-model:visible="showRouterModal"
-      title="编辑路由器"
+      title="路由器信息"
       @ok="handleSubmit"
       @cancel="resetRouterForm"
       ok-text="保存"

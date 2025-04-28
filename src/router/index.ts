@@ -1,13 +1,10 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import MarketCenter from "../views/MarketCenter.vue";
 import {
   HomeOutlined,
   SwapOutlined,
   UserOutlined,
   PlusOutlined,
   ShrinkOutlined,
-  PicRightOutlined,
-  AlignCenterOutlined,
 } from "@ant-design/icons-vue";
 import UserRegister from "@/views/user/UserRegister.vue";
 import UserLogin from "@/views/user/UserLogin.vue";
@@ -16,9 +13,10 @@ import UserProfile from "@/views/user/UserProfile.vue";
 import PublishDraft from "@/views/PublishDraft.vue";
 import { ACCESS_ENUM } from "@/utils/constant";
 import DesignerApplication from "@/views/DesignerApplication.vue";
+import RouterList from "@/views/RouterList.vue";
 import UserManagement from "@/views/user/UserManagement.vue";
-import OrderManagement from "@/views/order/OrderManagement.vue";
-import RouterList from "@/views/router/RouterList.vue";
+import WorkstationList from "@/views/WorkstationList.vue";
+import SwitchList from "@/views/SwitchList.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -35,7 +33,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "路由器管理",
     meta: {
       icon: SwapOutlined,
-      access: ACCESS_ENUM.UNKNOWN,
+      access: ACCESS_ENUM.ADMINISTRATOR,
     },
     component: RouterList,
   },
@@ -44,27 +42,27 @@ const routes: Array<RouteRecordRaw> = [
     name: "交换机管理",
     meta: {
       icon: UserOutlined,
-      access: ACCESS_ENUM.UNKNOWN,
+      access: ACCESS_ENUM.ADMINISTRATOR,
     },
-    component: UserProfile,
-  },
-  {
-    path: "/department",
-    name: "部门管理",
-    meta: {
-      icon: PlusOutlined,
-      access: ACCESS_ENUM.UNKNOWN,
-    },
-    component: PublishDraft,
+    component: SwitchList,
   },
   {
     path: "/workstation",
     name: "工位管理",
     meta: {
       icon: ShrinkOutlined,
-      access: ACCESS_ENUM.UNKNOWN,
+      access: ACCESS_ENUM.ADMINISTRATOR,
     },
-    component: DesignerApplication,
+    component: WorkstationList,
+  },
+  {
+    path: "/user/management",
+    name: "用户管理",
+    meta: {
+      icon: ShrinkOutlined,
+      access: ACCESS_ENUM.ADMINISTRATOR,
+    },
+    component: UserManagement,
   },
   {
     path: "/user/register",
