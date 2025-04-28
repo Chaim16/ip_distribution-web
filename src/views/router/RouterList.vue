@@ -141,6 +141,7 @@ const routerForm = reactive({
 });
 
 const toCreateRouter = ref(() => {
+  resetRouterForm();
   showRouterModal.value = true;
 });
 
