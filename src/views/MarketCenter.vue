@@ -108,7 +108,7 @@ const getDraftList = () => {
   });
 };
 
-getDraftList();
+// getDraftList();
 
 // const route = useRoute();
 //
@@ -176,7 +176,7 @@ const handlePurchase = () => {
     } else {
       // 创建订单
       const params = { draft_id: selectedDraft.value.id };
-      api.createOrder(params).then((res) => {
+      api.createRouter(params).then((res) => {
         if (res.code === 0) {
           orderId.value = res.data.id;
           message.success("订单创建成功，请跳转到个人中心-我的订单进行支付！");

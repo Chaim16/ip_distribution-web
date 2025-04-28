@@ -18,6 +18,7 @@ import { ACCESS_ENUM } from "@/utils/constant";
 import DesignerApplication from "@/views/DesignerApplication.vue";
 import UserManagement from "@/views/user/UserManagement.vue";
 import OrderManagement from "@/views/order/OrderManagement.vue";
+import RouterList from "@/views/router/RouterList.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -30,58 +31,40 @@ const routes: Array<RouteRecordRaw> = [
     component: HomeView,
   },
   {
-    path: "/market",
-    name: "画稿中心",
+    path: "/router",
+    name: "路由器管理",
     meta: {
       icon: SwapOutlined,
       access: ACCESS_ENUM.UNKNOWN,
     },
-    component: MarketCenter,
+    component: RouterList,
   },
   {
-    path: "/profile",
-    name: "个人中心",
+    path: "/switch",
+    name: "交换机管理",
     meta: {
       icon: UserOutlined,
-      access: ACCESS_ENUM.GENERAL,
+      access: ACCESS_ENUM.UNKNOWN,
     },
     component: UserProfile,
   },
   {
-    path: "/release",
-    name: "发布画稿",
+    path: "/department",
+    name: "部门管理",
     meta: {
       icon: PlusOutlined,
-      access: ACCESS_ENUM.DESIGNER,
+      access: ACCESS_ENUM.UNKNOWN,
     },
     component: PublishDraft,
   },
   {
-    path: "/designer_application",
-    name: "设计师申请管理",
+    path: "/workstation",
+    name: "工位管理",
     meta: {
       icon: ShrinkOutlined,
-      access: ACCESS_ENUM.ADMINISTRATOR,
+      access: ACCESS_ENUM.UNKNOWN,
     },
     component: DesignerApplication,
-  },
-  {
-    path: "/user/management",
-    name: "用户管理",
-    meta: {
-      icon: PicRightOutlined,
-      access: ACCESS_ENUM.ADMINISTRATOR,
-    },
-    component: UserManagement,
-  },
-  {
-    path: "/order/management",
-    name: "订单管理",
-    meta: {
-      icon: AlignCenterOutlined,
-      access: ACCESS_ENUM.ADMINISTRATOR,
-    },
-    component: OrderManagement,
   },
   {
     path: "/user/register",

@@ -66,7 +66,7 @@ import formatTimestamp from "@/utils/public";
 const orderList = ref([]);
 
 const getOrderList = () => {
-  api.orderList({}).then((res: ApiResponse) => {
+  api.routerList({}).then((res: ApiResponse) => {
     if (res.code === 0) {
       orderList.value = res.data?.list.map((item) => {
         item.orderUuid = item.order_uuid;
