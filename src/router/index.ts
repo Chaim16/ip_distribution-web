@@ -8,7 +8,6 @@ import {
 } from "@ant-design/icons-vue";
 import UserRegister from "@/views/user/UserRegister.vue";
 import UserLogin from "@/views/user/UserLogin.vue";
-import HomeView from "@/views/HomeView.vue";
 import { ACCESS_ENUM } from "@/utils/constant";
 import RouterList from "@/views/RouterList.vue";
 import UserManagement from "@/views/user/UserManagement.vue";

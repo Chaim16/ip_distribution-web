@@ -14,6 +14,13 @@
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'operate'">
+            <a-button
+              type="primary"
+              size="small"
+              @click="toModifyWorkstation(record)"
+              style="margin-right: 10px"
+              >编辑
+            </a-button>
             <a-popconfirm
               title="确定要删除吗？"
               ok-text="确认"
@@ -55,31 +62,44 @@
         :wrapperCol="{ span: 19 }"
         style="margin-top: 50px"
       >
-        <a-form-item label="上联交换机">
-          <a-select :options="switchList"></a-select>
+        <a-form-item label="编号">
           <a-input
-            v-model:value="workstationForm.name"
-            placeholder="请输入路由器名称"
-          />
-        </a-form-item>
-        <a-form-item label="型号">
-          <a-input
-            v-model:value="workstationForm.model"
-            placeholder="请输入型号"
-          />
-        </a-form-item>
-        <a-form-item label="端口数量">
-          <a-input-number
-            v-model:value="workstationForm.port_num"
-            :default-value="20"
-            style="width: 100%"
+            v-model:value="workstationForm.code"
+            placeholder="请输入编号"
           />
         </a-form-item>
         <a-form-item label="所在位置">
           <a-input
             v-model:value="workstationForm.location"
-            placeholder="请输入位置"
+            placeholder="请输入所在位置"
           />
+        </a-form-item>
+        <a-form-item label="上联交换机">
+          <a-select
+            v-model:value="workstationForm.switch_id"
+            @change="toDistribute"
+            :options="switchList"
+            :field-names="{ label: 'name', value: 'id' }"
+          >
+          </a-select>
+        </a-form-item>
+        <a-form-item label="分配地址">
+          <a-input
+            disabled
+            v-model:value="workstationForm.distributed_ip_addr"
+          />
+        </a-form-item>
+        <a-form-item label="分配网关">
+          <a-input
+            disabled
+            v-model:value="workstationForm.distributed_gateway"
+          />
+        </a-form-item>
+        <a-form-item label="分配DNS">
+          <a-input disabled v-model:value="workstationForm.distributed_dns" />
+        </a-form-item>
+        <a-form-item label="子网掩码">
+          <a-input disabled v-model:value="workstationForm.distributed_mask" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -94,7 +114,7 @@ import { ApiResponse } from "@/utils/axios";
 
 const workstationList = ref([]);
 
-const getworkstationList = () => {
+const getWorkstationList = () => {
   api.workstationList({}).then((res: ApiResponse) => {
     if (res.code === 0) {
       workstationList.value = res.data?.list.map((item: object) => {
@@ -106,7 +126,21 @@ const getworkstationList = () => {
   });
 };
 
-getworkstationList();
+getWorkstationList();
+
+const switchList = ref([]);
+
+const getSwitchList = () => {
+  api.switchList({}).then((res: ApiResponse) => {
+    if (res.code === 0) {
+      switchList.value = res.data?.list.map((item: object) => {
+        return item;
+      });
+    } else {
+      message.error(res.message);
+    }
+  });
+};
 
 const pagination = ref({
   pageSize: 10,
@@ -130,14 +164,15 @@ const columns = [
   { title: "网关", dataIndex: "gateway", key: "gateway" },
   { title: "DNS", dataIndex: "dns", key: "dns" },
   { title: "子网掩码", dataIndex: "mask", key: "mask" },
+  { title: "操作", dataIndex: "operate", key: "operate" },
 ];
 
 const deleteWorkstation = (record) => {
-  const params = { username: record.username };
+  const params = { id: record.id };
   api.deleteWorkstation(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       message.success("删除成功");
-      getworkstationList();
+      getWorkstationList();
     } else {
       message.error(res.message);
     }
@@ -148,42 +183,50 @@ const showWorkstationModal = ref(false);
 
 const workstationForm = reactive({
   id: null,
-  name: "",
-  model: "",
-  port_num: 1,
+  code: "",
   location: "",
+  switch_id: null,
+  distributed_ip_addr: "",
+  distributed_gateway: "",
+  distributed_dns: "",
+  distributed_mask: "",
 });
-
-const switchList = ref([]);
-
-const getSwitchList = () => {
-  console.log(123);
-  api.switchList({}).then((res: ApiResponse) => {
-    if (res.code === 0) {
-      switchList.value = res.data?.list.map((item: object) => {
-        return item;
-      });
-    } else {
-      message.error(res.message);
-    }
-  });
-};
 
 const toCreateWorkstation = ref(() => {
   resetWorkstationForm();
+  getWorkstationList();
   getSwitchList();
   showWorkstationModal.value = true;
 });
 
+const toDistribute = ref(() => {
+  const params = { switch_id: workstationForm.switch_id };
+  api.distribute(params).then((res: ApiResponse) => {
+    if (res.code === 0) {
+      const data = res.data;
+      workstationForm.distributed_ip_addr = data.ip_addr;
+      workstationForm.distributed_gateway = data.gateway;
+      workstationForm.distributed_dns = data.dns;
+      workstationForm.distributed_mask = data.mask;
+    } else {
+      message.error(res.message);
+    }
+  });
+});
+
 const toModifyWorkstation = ref((record) => {
   // 获取详情
-  api.routerDetail({ id: record.id }).then((res: ApiResponse) => {
+  api.workstationDetail({ id: record.id }).then((res: ApiResponse) => {
     if (res.code === 0) {
       const data = res.data;
       workstationForm.id = data.id;
-      workstationForm.name = data.name;
-      workstationForm.model = data.model;
-      workstationForm.port_num = data.port_num;
+      workstationForm.code = data.code;
+      workstationForm.switch_id = data.switch_id;
+      getSwitchList();
+      workstationForm.distributed_ip_addr = data.ip_addr;
+      workstationForm.distributed_gateway = data.gateway;
+      workstationForm.distributed_dns = data.dns;
+      workstationForm.distributed_mask = data.mask;
       workstationForm.location = data.location;
     } else {
       message.error(res.message);
@@ -193,12 +236,14 @@ const toModifyWorkstation = ref((record) => {
 });
 
 const handleSubmit = () => {
-  console.log(123);
   if (
-    !workstationForm.name ||
-    !workstationForm.model ||
-    !workstationForm.port_num ||
-    !workstationForm.location
+    !workstationForm.code ||
+    !workstationForm.location ||
+    !workstationForm.switch_id ||
+    !workstationForm.distributed_ip_addr ||
+    !workstationForm.distributed_gateway ||
+    !workstationForm.distributed_dns ||
+    !workstationForm.distributed_mask
   ) {
     message.warning("请填写完整信息！");
     return;
@@ -208,36 +253,36 @@ const handleSubmit = () => {
 
   if (workstationForm.id === null) {
     api
-      .createRouter({
-        name: workstationForm.name,
-        model: workstationForm.model,
-        port_num: workstationForm.port_num,
+      .createWorkstation({
+        code: workstationForm.code,
         location: workstationForm.location,
+        switch_id: workstationForm.switch_id,
+        distributed_ip_addr: workstationForm.distributed_ip_addr,
       })
       .then((res: ApiResponse) => {
         if (res.code === 0) {
           message.success("创建成功！");
           showWorkstationModal.value = false;
           resetWorkstationForm(); // 重置表单
-          getworkstationList(); // 刷新列表
+          getWorkstationList(); // 刷新列表
         } else {
           message.error(res.message);
         }
       });
   } else {
     api
-      .modifyRouter({
+      .modifyWorkstation({
         id: workstationForm.id,
-        name: workstationForm.name,
-        model: workstationForm.model,
-        port_num: workstationForm.port_num,
+        code: workstationForm.code,
         location: workstationForm.location,
+        switch_id: workstationForm.switch_id,
+        distributed_ip_addr: workstationForm.distributed_ip_addr,
       })
       .then((res: ApiResponse) => {
         if (res.code === 0) {
           message.success("编辑成功！");
           showWorkstationModal.value = false;
-          getworkstationList(); // 刷新列表
+          getWorkstationList(); // 刷新列表
           resetWorkstationForm(); // 重置表单
         } else {
           message.error(res.message);
@@ -248,10 +293,13 @@ const handleSubmit = () => {
 
 const resetWorkstationForm = () => {
   workstationForm.id = null;
-  workstationForm.name = "";
-  workstationForm.model = "";
-  workstationForm.port_num = 1;
+  workstationForm.code = "";
   workstationForm.location = "";
+  workstationForm.switch_id = null;
+  workstationForm.distributed_ip_addr = "";
+  workstationForm.distributed_gateway = "";
+  workstationForm.distributed_dns = "";
+  workstationForm.distributed_mask = "";
 };
 </script>
 

@@ -50,39 +50,9 @@ const api = {
     );
     return res.data;
   },
-  applyDesignerList: async (params: object) => {
-    const res = await axiosInstance.get(
-      "/distribution/api/v1/user/apply_designer_list/",
-      { params }
-    );
-    return res.data;
-  },
-  approveDesignerApplication: async (body: object) => {
-    const res = await axiosInstance.post(
-      "/distribution/api/v1/user/approve_designer_application/",
-      body
-    );
-    return res.data;
-  },
   userList: async (params: object) => {
     const res = await axiosInstance.get(
       "/distribution/api/v1/user/user_list/",
-      {
-        params,
-      }
-    );
-    return res.data;
-  },
-  publishDraft: async (body: object) => {
-    const res = await axiosInstance.post(
-      "/distribution/api/v1/draft/publish/",
-      body
-    );
-    return res.data;
-  },
-  draftList: async (params: object) => {
-    const res = await axiosInstance.get(
-      "/distribution/api/v1/draft/draft_list/",
       {
         params,
       }
@@ -160,9 +130,23 @@ const api = {
     );
     return res.data;
   },
+  modifyWorkstation: async (body: object) => {
+    const res = await axiosInstance.post(
+      "/distribution/api/v1/workstation/modify/",
+      body
+    );
+    return res.data;
+  },
   deleteWorkstation: async (body: object) => {
     const res = await axiosInstance.post(
       "/distribution/api/v1/workstation/del_workstation/",
+      body
+    );
+    return res.data;
+  },
+  distribute: async (body: object) => {
+    const res = await axiosInstance.post(
+      "/distribution/api/v1/workstation/distribute/",
       body
     );
     return res.data;

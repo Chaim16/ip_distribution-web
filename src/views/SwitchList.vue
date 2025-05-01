@@ -202,8 +202,6 @@ const getRouterList = () => {
 };
 
 const getRouterPortList = () => {
-  console.log(123321321);
-  console.log(switchForm.router_id);
   const params = {};
   if (!switchForm.router_id) {
     return;
@@ -247,6 +245,7 @@ const toModifySwitch = ref((record) => {
       switchForm.name = data.name;
       switchForm.model = data.model;
       switchForm.router_id = data.router_id;
+      getRouterPortList();
       switchForm.router_port_id = data.router_port_id;
       switchForm.port_num = data.port_num;
       switchForm.location = data.location;
