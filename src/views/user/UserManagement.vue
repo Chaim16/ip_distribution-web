@@ -4,7 +4,7 @@
       <a-table
         :dataSource="userList"
         :columns="columns"
-        :pagination="pagination"
+        :pagination="false"
         class="order-table"
         rowKey="id"
       >
@@ -18,12 +18,12 @@
               :disabled="record.role === 'administrator'"
             >
               <a-button danger :disabled="record.role === 'administrator'"
-                >删除</a-button
-              >
+                >删除
+              </a-button>
             </a-popconfirm>
           </template>
           <template v-else-if="column.key === 'role'">
-            <a-tag :color="record.role === 'designer' ? 'green' : 'blue'">
+            <a-tag :color="record.role === 'administrator' ? 'green' : 'blue'">
               {{ ROLE_MAP[record.role] }}
             </a-tag>
           </template>
@@ -35,12 +35,19 @@
           </template>
         </template>
       </a-table>
+      <a-pagination
+        :current="pagination.page"
+        :pageSize="pagination.size"
+        :total="pagination.count"
+        @change="handlePageChange"
+        style="margin-top: 20px; text-align: right"
+      />
     </a-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { message } from "ant-design-vue";
 import api from "@/api/api";
 import { ApiResponse } from "@/utils/axios";
@@ -48,12 +55,23 @@ import { ROLE_MAP } from "../../utils/constant";
 
 const userList = ref([]);
 
+const pagination = ref({
+  size: 10,
+  page: 1,
+  count: null,
+});
+
 const getUserList = () => {
-  api.userList({}).then((res: ApiResponse) => {
+  const params = {
+    page: pagination.value.page,
+    size: pagination.value.size,
+  };
+  api.userList(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       userList.value = res.data?.list.map((item: object) => {
         return item;
       });
+      pagination.value.count = res.data?.count || 0;
     } else {
       message.error(res.message);
     }
@@ -62,18 +80,13 @@ const getUserList = () => {
 
 getUserList();
 
-const pagination = ref({
-  pageSize: 10,
-  current: 1,
-  total: userList.value.length,
-});
-
-watch(userList, () => {
-  pagination.value.total = userList.value.length;
-});
+const handlePageChange = (newPage: number) => {
+  pagination.value.page = newPage;
+  getUserList();
+};
 
 const columns = [
-  { title: "序号", dataIndex: "id", key: "id" },
+  { title: "ID", dataIndex: "id", key: "id" },
   { title: "用户名", dataIndex: "username", key: "username" },
   { title: "昵称", dataIndex: "nickname", key: "nickname" },
   {

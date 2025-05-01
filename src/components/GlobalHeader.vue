@@ -27,17 +27,24 @@
       </div>
     </div>
     <div class="header-right">
-      <a-popconfirm
-        title="确定要退出登录吗？"
-        ok-text="确认"
-        cancel-text="取消"
-        @confirm="logout"
-        @cancel="cancel"
-      >
-        <div class="login-or-register">
-          {{ store.state.user?.loginUser?.username ?? "未登录" }}
+      <div v-if="store.state.user?.loginUser?.username">
+        <a-popconfirm
+          title="确定要退出登录吗？"
+          ok-text="确认"
+          cancel-text="取消"
+          @confirm="logout"
+          @cancel="cancel"
+        >
+          <div class="login-or-register">
+            {{ store.state.user?.loginUser?.username ?? "未登录" }}
+          </div>
+        </a-popconfirm>
+      </div>
+      <div v-else>
+        <div @click="router.push('/user/login')" class="login-or-register">
+          未登录
         </div>
-      </a-popconfirm>
+      </div>
     </div>
   </div>
 </template>

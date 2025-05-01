@@ -93,30 +93,30 @@ if (route.query.router_id) {
 
 const routerPortList = ref([]);
 
+const pagination = ref({
+  size: 10,
+  page: 1,
+  count: null,
+});
+
 const getRouterPortList = () => {
-  const params = {};
+  const params = {
+    page: pagination.value.page,
+    size: pagination.value.size,
+  };
   if (router_id.value) {
     params.router_id = router_id.value;
   }
   api.routerPortList(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       routerPortList.value = res.data?.list.map((item) => item);
+      pagination.value.count = res.data?.count;
     } else {
       message.error(res.message);
     }
   });
 };
 getRouterPortList();
-
-const pagination = ref({
-  pageSize: 10,
-  current: 1,
-  total: routerPortList.value.length,
-});
-
-watch(routerPortList, () => {
-  pagination.value.total = routerPortList.value.length;
-});
 
 const columns = [
   { title: "ID", key: "id", dataIndex: "id", width: 180 },
@@ -128,17 +128,6 @@ const columns = [
   { title: "DNS", key: "dns", dataIndex: "dns", width: 180 },
   { title: "操作", key: "operate", dataIndex: "operate", width: 240 },
 ];
-
-const deleteRouterPort = (record) => {
-  api.deleteRouter({ id: record.id }).then((res: ApiResponse) => {
-    if (res.code === 0) {
-      message.success("删除成功");
-      getRouterPortList();
-    } else {
-      message.error(res.message);
-    }
-  });
-};
 
 const showRouterPortModal = ref(false);
 

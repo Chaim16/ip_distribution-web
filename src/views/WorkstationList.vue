@@ -1,6 +1,6 @@
 <template>
   <div id="container">
-    <a-card title="工位" bordered class="order-card">
+    <a-card title="工位列表" bordered class="order-card">
       <!-- 创建按钮 -->
       <div class="header-actions">
         <a-button type="primary" @click="toCreateWorkstation">创建</a-button>
@@ -8,7 +8,6 @@
       <a-table
         :dataSource="workstationList"
         :columns="columns"
-        :pagination="pagination"
         class="order-table"
         rowKey="id"
       >
@@ -46,6 +45,13 @@
           </template>
         </template>
       </a-table>
+      <a-pagination
+        :current="pagination.page"
+        :pageSize="pagination.size"
+        :total="pagination.count"
+        @change="handlePageChange"
+        style="margin-top: 20px; text-align: right"
+      />
     </a-card>
 
     <a-modal
@@ -73,6 +79,14 @@
             v-model:value="workstationForm.location"
             placeholder="请输入所在位置"
           />
+        </a-form-item>
+        <a-form-item label="员工">
+          <a-select
+            v-model:value="workstationForm.user_id"
+            :options="userList"
+            :field-names="{ label: 'nickname', value: 'id' }"
+          >
+          </a-select>
         </a-form-item>
         <a-form-item label="上联交换机">
           <a-select
@@ -113,6 +127,11 @@ import api from "@/api/api";
 import { ApiResponse } from "@/utils/axios";
 
 const workstationList = ref([]);
+const pagination = ref({
+  size: 10,
+  page: 1,
+  count: null,
+});
 
 const getWorkstationList = () => {
   api.workstationList({}).then((res: ApiResponse) => {
@@ -120,6 +139,7 @@ const getWorkstationList = () => {
       workstationList.value = res.data?.list.map((item: object) => {
         return item;
       });
+      pagination.value.count = res.data?.count || 0;
     } else {
       message.error(res.message);
     }
@@ -131,7 +151,11 @@ getWorkstationList();
 const switchList = ref([]);
 
 const getSwitchList = () => {
-  api.switchList({}).then((res: ApiResponse) => {
+  const params = {
+    page: 1,
+    size: 9999,
+  };
+  api.switchList(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       switchList.value = res.data?.list.map((item: object) => {
         return item;
@@ -142,20 +166,29 @@ const getSwitchList = () => {
   });
 };
 
-const pagination = ref({
-  pageSize: 10,
-  current: 1,
-  total: workstationList.value.length,
-});
+const userList = ref([]);
 
-watch(workstationList, () => {
-  pagination.value.total = workstationList.value.length;
-});
+const getUserList = () => {
+  const params = {
+    page: 1,
+    size: 9999,
+  };
+  api.userList(params).then((res: ApiResponse) => {
+    if (res.code === 0) {
+      userList.value = res.data?.list.map((item: object) => {
+        return item;
+      });
+    } else {
+      message.error(res.message);
+    }
+  });
+};
 
 const columns = [
-  { title: "序号", dataIndex: "id", key: "id" },
+  { title: "ID", dataIndex: "id", key: "id" },
   { title: "编号", dataIndex: "code", key: "code" },
   { title: "所在位置", dataIndex: "location", key: "location" },
+  { title: "员工", dataIndex: "user_nickname", key: "user_nickname" },
   {
     title: "IP地址",
     dataIndex: "ip_addr",
@@ -166,6 +199,11 @@ const columns = [
   { title: "子网掩码", dataIndex: "mask", key: "mask" },
   { title: "操作", dataIndex: "operate", key: "operate" },
 ];
+
+const handlePageChange = (newPage: number) => {
+  pagination.value.page = newPage;
+  getWorkstationList();
+};
 
 const deleteWorkstation = (record) => {
   const params = { id: record.id };
@@ -190,11 +228,13 @@ const workstationForm = reactive({
   distributed_gateway: "",
   distributed_dns: "",
   distributed_mask: "",
+  user_id: null,
 });
 
 const toCreateWorkstation = ref(() => {
   resetWorkstationForm();
   getWorkstationList();
+  getUserList();
   getSwitchList();
   showWorkstationModal.value = true;
 });
@@ -228,6 +268,8 @@ const toModifyWorkstation = ref((record) => {
       workstationForm.distributed_dns = data.dns;
       workstationForm.distributed_mask = data.mask;
       workstationForm.location = data.location;
+      workstationForm.user_id = data.user_id;
+      getUserList();
     } else {
       message.error(res.message);
     }
@@ -258,6 +300,7 @@ const handleSubmit = () => {
         location: workstationForm.location,
         switch_id: workstationForm.switch_id,
         distributed_ip_addr: workstationForm.distributed_ip_addr,
+        user_id: workstationForm.user_id,
       })
       .then((res: ApiResponse) => {
         if (res.code === 0) {
@@ -277,6 +320,7 @@ const handleSubmit = () => {
         location: workstationForm.location,
         switch_id: workstationForm.switch_id,
         distributed_ip_addr: workstationForm.distributed_ip_addr,
+        user_id: workstationForm.user_id,
       })
       .then((res: ApiResponse) => {
         if (res.code === 0) {
@@ -300,6 +344,7 @@ const resetWorkstationForm = () => {
   workstationForm.distributed_gateway = "";
   workstationForm.distributed_dns = "";
   workstationForm.distributed_mask = "";
+  workstationForm.user_id = null;
 };
 </script>
 

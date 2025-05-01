@@ -14,17 +14,19 @@ import UserManagement from "@/views/user/UserManagement.vue";
 import WorkstationList from "@/views/WorkstationList.vue";
 import SwitchList from "@/views/SwitchList.vue";
 import RouterPortList from "@/views/RouterPortList.vue";
+import HomeView from "@/views/HomeView.vue";
 
 const routes: Array<RouteRecordRaw> = [
-  // {
-  //   path: "/",
-  //   name: "首页",
-  //   meta: {
-  //     icon: HomeOutlined,
-  //     access: ACCESS_ENUM.UNKNOWN,
-  //   },
-  //   component: HomeView,
-  // },
+  {
+    path: "/",
+    name: "首页",
+    meta: {
+      icon: HomeOutlined,
+      hideInMenu: true,
+      access: ACCESS_ENUM.UNKNOWN,
+    },
+    component: HomeView,
+  },
   {
     path: "/router",
     name: "路由器管理",

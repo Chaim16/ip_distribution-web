@@ -8,7 +8,6 @@
       <a-table
         :dataSource="switchList"
         :columns="columns"
-        :pagination="pagination"
         class="order-table"
         rowKey="id"
       >
@@ -49,6 +48,13 @@
           </template>
         </template>
       </a-table>
+      <a-pagination
+        :current="pagination.page"
+        :pageSize="pagination.size"
+        :total="pagination.count"
+        @change="handlePageChange"
+        style="margin-top: 20px; text-align: right"
+      />
     </a-card>
 
     <a-modal
@@ -116,12 +122,23 @@ import { ApiResponse } from "@/utils/axios";
 
 const switchList = ref([]);
 
+const pagination = ref({
+  size: 10,
+  page: 1,
+  count: null,
+});
+
 const getSwitchList = () => {
-  api.switchList({}).then((res: ApiResponse) => {
+  const params = {
+    page: pagination.value.page,
+    size: pagination.value.size,
+  };
+  api.switchList(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       switchList.value = res.data?.list.map((item: object) => {
         return item;
       });
+      pagination.value.count = res.data?.count || 0;
     } else {
       message.error(res.message);
     }
@@ -129,16 +146,6 @@ const getSwitchList = () => {
 };
 
 getSwitchList();
-
-const pagination = ref({
-  pageSize: 10,
-  current: 1,
-  total: switchList.value.length,
-});
-
-watch(switchList, () => {
-  pagination.value.total = switchList.value.length;
-});
 
 const columns = [
   { title: "ID", dataIndex: "id", key: "id" },
@@ -173,6 +180,11 @@ const deleteswitch = (record) => {
   });
 };
 
+const handlePageChange = (newPage: number) => {
+  pagination.value.page = newPage;
+  getSwitchList();
+};
+
 const showSwitchModal = ref(false);
 
 const switchForm = reactive({
@@ -190,7 +202,11 @@ const routerList = ref([]);
 const routerPortList = ref([]);
 
 const getRouterList = () => {
-  api.routerList({}).then((res: ApiResponse) => {
+  const params = {
+    page: 1,
+    size: 9999,
+  };
+  api.routerList(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       routerList.value = res.data?.list.map((item: object) => {
         return item;
@@ -218,7 +234,6 @@ const getRouterPortList = () => {
           item.start_addr +
           " 结束" +
           item.end_addr;
-        console.log(item.label);
         return item;
       });
     } else {

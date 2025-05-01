@@ -8,7 +8,6 @@
       <a-table
         :dataSource="routerList"
         :columns="columns"
-        :pagination="pagination"
         class="router-table"
         rowKey="id"
       >
@@ -42,6 +41,13 @@
           </template>
         </template>
       </a-table>
+      <a-pagination
+        :current="pagination.page"
+        :pageSize="pagination.size"
+        :total="pagination.count"
+        @change="handlePageChange"
+        style="margin-top: 20px; text-align: right"
+      />
     </a-card>
 
     <a-modal
@@ -95,26 +101,27 @@ import router from "@/router";
 
 const routerList = ref([]);
 
+const pagination = ref({
+  size: 10,
+  page: 1,
+  count: null,
+});
+
 const getRouterList = () => {
-  api.routerList({}).then((res: ApiResponse) => {
+  const params = {
+    page: pagination.value.page,
+    size: pagination.value.size,
+  };
+  api.routerList(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       routerList.value = res.data?.list.map((item) => item);
+      pagination.value.count = res.data?.count;
     } else {
       message.error(res.message);
     }
   });
 };
 getRouterList();
-
-const pagination = ref({
-  pageSize: 10,
-  current: 1,
-  total: routerList.value.length,
-});
-
-watch(routerList, () => {
-  pagination.value.total = routerList.value.length;
-});
 
 const columns = [
   { title: "ID", key: "id", dataIndex: "id", width: 180 },
@@ -135,6 +142,11 @@ const deleteRouter = (record) => {
       message.error(res.message);
     }
   });
+};
+
+const handlePageChange = (newPage: number) => {
+  pagination.value.page = newPage;
+  getRouterList();
 };
 
 const showRouterModal = ref(false);
@@ -180,8 +192,6 @@ const handleSubmit = () => {
     message.warning("请填写完整信息！");
     return;
   }
-  console.log(routerForm.id);
-  console.log(routerForm.id === null);
 
   if (routerForm.id === null) {
     api
