@@ -8,6 +8,7 @@
       <a-table
         :dataSource="routerList"
         :columns="columns"
+        :pagination="false"
         class="router-table"
         rowKey="id"
       >
@@ -78,6 +79,7 @@
             v-model:value="routerForm.port_num"
             :default-value="20"
             style="width: 100%"
+            :disabled="port_num_disabled"
           />
         </a-form-item>
         <a-form-item label="所在位置">
@@ -92,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from "vue";
+import { ref, reactive } from "vue";
 import { message } from "ant-design-vue";
 import api from "@/api/api";
 import { ApiResponse } from "@/utils/axios";
@@ -100,6 +102,8 @@ import formatTimestamp from "@/utils/public";
 import router from "@/router";
 
 const routerList = ref([]);
+
+const port_num_disabled = ref(false);
 
 const pagination = ref({
   size: 10,
@@ -161,10 +165,12 @@ const routerForm = reactive({
 
 const toCreateRouter = ref(() => {
   resetRouterForm();
+  port_num_disabled.value = false;
   showRouterModal.value = true;
 });
 
 const toModifyRouter = ref((record) => {
+  port_num_disabled.value = true;
   // 获取详情
   api.routerDetail({ id: record.id }).then((res: ApiResponse) => {
     if (res.code === 0) {
@@ -207,6 +213,7 @@ const handleSubmit = () => {
           showRouterModal.value = false;
           resetRouterForm(); // 重置表单
           getRouterList(); // 刷新列表
+          port_num_disabled.value = true;
         } else {
           message.error(res.message);
         }

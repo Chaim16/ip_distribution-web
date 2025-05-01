@@ -1,6 +1,6 @@
 <template>
   <div id="container">
-    <a-card title="交换机列表" bordered class="order-card">
+    <a-card title="交换机列表" bordered>
       <!-- 创建按钮 -->
       <div class="header-actions">
         <a-button type="primary" @click="toCreateSwitch">创建</a-button>
@@ -8,6 +8,7 @@
       <a-table
         :dataSource="switchList"
         :columns="columns"
+        :pagination="false"
         class="order-table"
         rowKey="id"
       >
@@ -218,11 +219,15 @@ const getRouterList = () => {
 };
 
 const getRouterPortList = () => {
-  const params = {};
   if (!switchForm.router_id) {
     return;
   }
-  params.router_id = switchForm.router_id;
+  const params = {
+    router_id: switchForm.router_id,
+    page: 1,
+    size: 9999,
+    config: 0,
+  };
   api.routerPortList(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       routerPortList.value = res.data?.list.map((item: object) => {
@@ -348,13 +353,8 @@ const resetSwitchForm = () => {
 <style scoped>
 #container {
   align-items: center;
-  margin-left: 10%;
-  width: 100%;
-}
-
-.order-card {
-  width: 80%;
-  align-items: center;
+  margin-left: 5%;
+  margin-right: 5%;
 }
 
 .order-table {

@@ -4,7 +4,7 @@
       <a-table
         :dataSource="routerPortList"
         :columns="columns"
-        :pagination="pagination"
+        :pagination="false"
         class="router-table"
         rowKey="id"
       >

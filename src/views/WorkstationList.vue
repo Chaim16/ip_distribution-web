@@ -9,6 +9,7 @@
         :dataSource="workstationList"
         :columns="columns"
         class="order-table"
+        :pagination="false"
         rowKey="id"
       >
         <template #bodyCell="{ column, record }">

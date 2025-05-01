@@ -33,6 +33,7 @@ export default defineComponent({
   padding: 20px;
   background: linear-gradient(to right, #bbb, #fff);
   padding-bottom: 80px; /* 大于等于页脚高度 */
+  min-height: 800px;
 }
 
 #basicLayout .footer {
