@@ -176,6 +176,45 @@ const api = {
     );
     return res.data;
   },
+  createSwitch: async (body: object) => {
+    const res = await axiosInstance.post(
+      "/distribution/api/v1/switch/add/",
+      body
+    );
+    return res.data;
+  },
+  deleteSwitch: async (body: object) => {
+    const res = await axiosInstance.post(
+      "/distribution/api/v1/switch/del_switch/",
+      body
+    );
+    return res.data;
+  },
+  modifySwitch: async (body: object) => {
+    const res = await axiosInstance.post(
+      "/distribution/api/v1/switch/modify/",
+      body
+    );
+    return res.data;
+  },
+  switchPortList: async (params: object) => {
+    const res = await axiosInstance.get(
+      "/distribution/api/v1/switch_port/switch_port_list/",
+      {
+        params,
+      }
+    );
+    return res.data;
+  },
+  switchDetail: async (params: object) => {
+    const res = await axiosInstance.get(
+      "/distribution/api/v1/switch/switch_detail/",
+      {
+        params,
+      }
+    );
+    return res.data;
+  },
   routerPortList: async (params: object) => {
     const res = await axiosInstance.get(
       "/distribution/api/v1/router_port/router_port_list/",

@@ -14,6 +14,13 @@
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'operate'">
+            <a-button
+              type="primary"
+              size="small"
+              @click="toModifySwitch(record)"
+              style="margin-right: 10px"
+              >编辑
+            </a-button>
             <a-popconfirm
               title="确定要删除吗？"
               ok-text="确认"
@@ -21,7 +28,10 @@
               @confirm="deleteswitch(record)"
               :disabled="record.role === 'administrator'"
             >
-              <a-button danger :disabled="record.role === 'administrator'"
+              <a-button
+                size="small"
+                danger
+                :disabled="record.role === 'administrator'"
                 >删除
               </a-button>
             </a-popconfirm>
@@ -43,7 +53,7 @@
 
     <a-modal
       v-model:visible="showSwitchModal"
-      title="工位信息"
+      title="交换机信息"
       @ok="handleSubmit"
       @cancel="resetswitchForm"
       ok-text="保存"
@@ -51,16 +61,15 @@
     >
       <a-form
         :model="switchForm"
-        :labelCol="{ span: 5 }"
-        :wrapperCol="{ span: 19 }"
+        :labelCol="{ span: 4 }"
+        :wrapperCol="{ span: 23 }"
         style="margin-top: 50px"
       >
-        <a-form-item label="上联交换机">
-          <a-select :options="switchList"></a-select>
-          <a-input
-            v-model:value="switchForm.name"
-            placeholder="请输入路由器名称"
-          />
+        <a-form-item label="名称">
+          <a-input v-model:value="switchForm.name" placeholder="请输入名称" />
+        </a-form-item>
+        <a-form-item label="编号">
+          <a-input v-model:value="switchForm.code" placeholder="请输入编号" />
         </a-form-item>
         <a-form-item label="型号">
           <a-input v-model:value="switchForm.model" placeholder="请输入型号" />
@@ -78,6 +87,22 @@
             placeholder="请输入位置"
           />
         </a-form-item>
+        <a-form-item label="上联路由器">
+          <a-select
+            v-model:value="switchForm.router_id"
+            @change="getRouterPortList"
+            :options="routerList"
+            :field-names="{ label: 'name', value: 'id' }"
+          >
+          </a-select>
+        </a-form-item>
+        <a-form-item label="上联端口">
+          <a-select
+            v-model:value="switchForm.router_port_id"
+            :options="routerPortList"
+            :field-names="{ label: 'label', value: 'id' }"
+          ></a-select>
+        </a-form-item>
       </a-form>
     </a-modal>
   </div>
@@ -92,7 +117,6 @@ import { ApiResponse } from "@/utils/axios";
 const switchList = ref([]);
 
 const getSwitchList = () => {
-  console.log(123);
   api.switchList({}).then((res: ApiResponse) => {
     if (res.code === 0) {
       switchList.value = res.data?.list.map((item: object) => {
@@ -103,6 +127,8 @@ const getSwitchList = () => {
     }
   });
 };
+
+getSwitchList();
 
 const pagination = ref({
   pageSize: 10,
@@ -115,22 +141,29 @@ watch(switchList, () => {
 });
 
 const columns = [
-  { title: "序号", dataIndex: "id", key: "id" },
+  { title: "ID", dataIndex: "id", key: "id" },
+  { title: "名称", dataIndex: "name", key: "name" },
   { title: "编号", dataIndex: "code", key: "code" },
+  { title: "型号", dataIndex: "model", key: "model" },
   { title: "所在位置", dataIndex: "location", key: "location" },
   {
-    title: "IP地址",
-    dataIndex: "ip_addr",
-    key: "ip_addr",
+    title: "端口数量",
+    dataIndex: "port_num",
+    key: "port_num",
   },
+  { title: "上联路由器", dataIndex: "router_name", key: "router_name" },
+  { title: "上联端口", dataIndex: "router_port_code", key: "router_port_code" },
+
   { title: "网关", dataIndex: "gateway", key: "gateway" },
   { title: "DNS", dataIndex: "dns", key: "dns" },
   { title: "子网掩码", dataIndex: "mask", key: "mask" },
+  { title: "创建时间", dataIndex: "create_time", key: "create_time" },
+  { title: "操作", key: "operate" },
 ];
 
 const deleteswitch = (record) => {
-  const params = { username: record.username };
-  api.deleteswitch(params).then((res: ApiResponse) => {
+  const params = { id: record.id };
+  api.deleteSwitch(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       message.success("删除成功");
       getSwitchList();
@@ -145,25 +178,76 @@ const showSwitchModal = ref(false);
 const switchForm = reactive({
   id: null,
   name: "",
+  code: "",
   model: "",
-  port_num: 1,
   location: "",
+  router_id: "",
+  router_port_id: "",
+  port_num: 20,
 });
 
+const routerList = ref([]);
+const routerPortList = ref([]);
+
+const getRouterList = () => {
+  api.routerList({}).then((res: ApiResponse) => {
+    if (res.code === 0) {
+      routerList.value = res.data?.list.map((item: object) => {
+        return item;
+      });
+    } else {
+      message.error(res.message);
+    }
+  });
+};
+
+const getRouterPortList = () => {
+  console.log(123321321);
+  console.log(switchForm.router_id);
+  const params = {};
+  if (!switchForm.router_id) {
+    return;
+  }
+  params.router_id = switchForm.router_id;
+  api.routerPortList(params).then((res: ApiResponse) => {
+    if (res.code === 0) {
+      routerPortList.value = res.data?.list.map((item: object) => {
+        item.label =
+          item.code +
+          " 网关" +
+          item.gateway +
+          " 起始" +
+          item.start_addr +
+          " 结束" +
+          item.end_addr;
+        console.log(item.label);
+        return item;
+      });
+    } else {
+      message.error(res.message);
+    }
+  });
+};
+
 const toCreateSwitch = ref(() => {
+  getRouterList();
   resetSwitchForm();
   getSwitchList();
   showSwitchModal.value = true;
 });
 
 const toModifySwitch = ref((record) => {
+  getRouterList();
   // 获取详情
-  api.routerDetail({ id: record.id }).then((res: ApiResponse) => {
+  api.switchDetail({ id: record.id }).then((res: ApiResponse) => {
     if (res.code === 0) {
       const data = res.data;
       switchForm.id = data.id;
+      switchForm.code = data.code;
       switchForm.name = data.name;
       switchForm.model = data.model;
+      switchForm.router_id = data.router_id;
+      switchForm.router_port_id = data.router_port_id;
       switchForm.port_num = data.port_num;
       switchForm.location = data.location;
     } else {
@@ -174,12 +258,14 @@ const toModifySwitch = ref((record) => {
 });
 
 const handleSubmit = () => {
-  console.log(123);
   if (
     !switchForm.name ||
+    !switchForm.code ||
     !switchForm.model ||
-    !switchForm.port_num ||
-    !switchForm.location
+    !switchForm.location ||
+    !switchForm.router_id ||
+    !switchForm.router_port_id ||
+    !switchForm.port_num
   ) {
     message.warning("请填写完整信息！");
     return;
@@ -189,11 +275,14 @@ const handleSubmit = () => {
 
   if (switchForm.id === null) {
     api
-      .createRouter({
+      .createSwitch({
         name: switchForm.name,
-        model: switchForm.model,
-        port_num: switchForm.port_num,
+        code: switchForm.code,
         location: switchForm.location,
+        model: switchForm.model,
+        router_id: switchForm.router_id,
+        router_port_id: switchForm.router_port_id,
+        port_num: switchForm.port_num,
       })
       .then((res: ApiResponse) => {
         if (res.code === 0) {
@@ -207,10 +296,13 @@ const handleSubmit = () => {
       });
   } else {
     api
-      .modifyRouter({
+      .modifySwitch({
         id: switchForm.id,
         name: switchForm.name,
+        code: switchForm.code,
         model: switchForm.model,
+        router_id: switchForm.router_id,
+        router_port_id: switchForm.router_port_id,
         port_num: switchForm.port_num,
         location: switchForm.location,
       })
@@ -230,16 +322,20 @@ const handleSubmit = () => {
 const resetSwitchForm = () => {
   switchForm.id = null;
   switchForm.name = "";
+  switchForm.code = "";
   switchForm.model = "";
-  switchForm.port_num = 1;
   switchForm.location = "";
+  switchForm.router_id = "";
+  switchForm.router_port_id = "";
+  switchForm.port_num = 20;
 };
 </script>
 
 <style scoped>
 #container {
   align-items: center;
-  margin-left: 15%;
+  margin-left: 10%;
+  width: 100%;
 }
 
 .order-card {

@@ -143,7 +143,7 @@ const routerForm = reactive({
   id: null,
   name: "",
   model: "",
-  port_num: 1,
+  port_num: 20,
   location: "",
 });
 

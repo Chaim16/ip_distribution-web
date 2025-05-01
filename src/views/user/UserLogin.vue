@@ -100,7 +100,7 @@ const login = () => {
       localStorage.setItem("access_token", res.access);
       localStorage.setItem("refresh_token", res.refresh);
       store.dispatch("user/getLoginUser");
-      router.push("/");
+      router.push("/router");
       message.success("登录成功");
     });
   } catch (e) {
