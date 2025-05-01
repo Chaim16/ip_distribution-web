@@ -14,7 +14,7 @@ import RouterList from "@/views/RouterList.vue";
 import UserManagement from "@/views/user/UserManagement.vue";
 import WorkstationList from "@/views/WorkstationList.vue";
 import SwitchList from "@/views/SwitchList.vue";
-import RouterPort from "@/views/RouterPort.vue";
+import RouterPortList from "@/views/RouterPortList.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -38,7 +38,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/router_port",
     name: "端口列表",
-    component: RouterPort,
+    component: RouterPortList,
     meta: {
       hideInMenu: true,
       access: ACCESS_ENUM.ADMINISTRATOR,

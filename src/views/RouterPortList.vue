@@ -1,10 +1,6 @@
 <template>
   <div id="container">
     <a-card title="路由器端口" bordered class="order-card">
-      <!-- 创建按钮 -->
-      <div class="header-actions">
-        <a-button type="primary" @click="toCreateRouter">创建</a-button>
-      </div>
       <a-table
         :dataSource="routerPortList"
         :columns="columns"
@@ -24,14 +20,6 @@
                 @click="toModifyRouterPort(record)"
                 >编辑
               </a-button>
-              <a-popconfirm
-                title="确定要删除吗？"
-                ok-text="确认"
-                cancel-text="取消"
-                @confirm="deleteRouterPort(record)"
-              >
-                <a-button danger size="small">删除</a-button>
-              </a-popconfirm>
             </a-space>
           </template>
         </template>
@@ -52,30 +40,36 @@
         :wrapperCol="{ span: 19 }"
         style="margin-top: 50px"
       >
-        <a-form-item label="名称">
+        <a-form-item label="编号">
+          <a-input disabled v-model:value="routerPortForm.code" />
+        </a-form-item>
+        <a-form-item label="起始地址">
           <a-input
-            v-model:value="routerPortForm.name"
-            placeholder="请输入路由器名称"
+            v-model:value="routerPortForm.start_addr"
+            placeholder="请输入起始地址"
           />
         </a-form-item>
-        <a-form-item label="型号">
+        <a-form-item label="结束地址">
           <a-input
-            v-model:value="routerPortForm.model"
-            placeholder="请输入型号"
-          />
-        </a-form-item>
-        <a-form-item label="端口数量">
-          <a-input-number
-            v-model:value="routerPortForm.port_num"
+            v-model:value="routerPortForm.end_addr"
             :default-value="20"
-            style="width: 100%"
+            placeholder="请输入结束地址"
           />
         </a-form-item>
-        <a-form-item label="所在位置">
+        <a-form-item label="子网掩码">
           <a-input
-            v-model:value="routerPortForm.location"
-            placeholder="请输入位置"
+            v-model:value="routerPortForm.mask"
+            placeholder="请输入子网掩码"
           />
+        </a-form-item>
+        <a-form-item label="网关">
+          <a-input
+            v-model:value="routerPortForm.gateway"
+            placeholder="请输入网关"
+          />
+        </a-form-item>
+        <a-form-item label="DNS">
+          <a-input v-model:value="routerPortForm.dns" placeholder="请输入DNS" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -104,7 +98,7 @@ const getRouterPortList = () => {
   if (router_id.value) {
     params.router_id = router_id.value;
   }
-  api.routerPortList({}).then((res: ApiResponse) => {
+  api.routerPortList(params).then((res: ApiResponse) => {
     if (res.code === 0) {
       routerPortList.value = res.data?.list.map((item) => item);
     } else {
@@ -126,11 +120,12 @@ watch(routerPortList, () => {
 
 const columns = [
   { title: "ID", key: "id", dataIndex: "id", width: 180 },
-  { title: "名称", key: "name", dataIndex: "name" },
-  { title: "型号", key: "model", dataIndex: "model" },
-  { title: "端口数量", key: "port_num", dataIndex: "port_num" },
-  { title: "所在位置", key: "location", dataIndex: "location" },
-  { title: "创建时间", key: "create_time", dataIndex: "create_time" },
+  { title: "编号", key: "code", dataIndex: "code", width: 180 },
+  { title: "起始地址", key: "start_addr", dataIndex: "start_addr", width: 180 },
+  { title: "结束地址", key: "end_addr", dataIndex: "end_addr", width: 180 },
+  { title: "子网掩码", key: "mask", dataIndex: "mask", width: 180 },
+  { title: "网关", key: "gateway", dataIndex: "gateway", width: 180 },
+  { title: "DNS", key: "dns", dataIndex: "dns", width: 180 },
   { title: "操作", key: "operate", dataIndex: "operate", width: 240 },
 ];
 
@@ -149,10 +144,12 @@ const showRouterPortModal = ref(false);
 
 const routerPortForm = reactive({
   id: null,
-  name: "",
-  model: "",
-  port_num: 1,
-  location: "",
+  code: "",
+  start_addr: "",
+  end_addr: "",
+  mask: "",
+  gateway: "",
+  dns: "",
 });
 
 const toCreateRouter = ref(() => {
@@ -162,14 +159,16 @@ const toCreateRouter = ref(() => {
 
 const toModifyRouterPort = ref((record) => {
   // 获取详情
-  api.routerDetail({ id: record.id }).then((res: ApiResponse) => {
+  api.routerPortDetail({ id: record.id }).then((res: ApiResponse) => {
     if (res.code === 0) {
       const data = res.data;
       routerPortForm.id = data.id;
-      routerPortForm.name = data.name;
-      routerPortForm.model = data.model;
-      routerPortForm.port_num = data.port_num;
-      routerPortForm.location = data.location;
+      routerPortForm.code = data.code;
+      routerPortForm.start_addr = data.start_addr;
+      routerPortForm.end_addr = data.end_addr;
+      routerPortForm.mask = data.mask;
+      routerPortForm.gateway = data.gateway;
+      routerPortForm.dns = data.dns;
     } else {
       message.error(res.message);
     }
@@ -180,10 +179,12 @@ const toModifyRouterPort = ref((record) => {
 const handleSubmit = () => {
   console.log(123);
   if (
-    !routerPortForm.name ||
-    !routerPortForm.model ||
-    !routerPortForm.port_num ||
-    !routerPortForm.location
+    !routerPortForm.code ||
+    !routerPortForm.start_addr ||
+    !routerPortForm.end_addr ||
+    !routerPortForm.mask ||
+    !routerPortForm.gateway ||
+    !routerPortForm.dns
   ) {
     message.warning("请填写完整信息！");
     return;
@@ -191,52 +192,36 @@ const handleSubmit = () => {
   console.log(routerPortForm.id);
   console.log(routerPortForm.id === null);
 
-  if (routerPortForm.id === null) {
-    api
-      .createRouter({
-        name: routerPortForm.name,
-        model: routerPortForm.model,
-        port_num: routerPortForm.port_num,
-        location: routerPortForm.location,
-      })
-      .then((res: ApiResponse) => {
-        if (res.code === 0) {
-          message.success("创建成功！");
-          showRouterPortModal.value = false;
-          resetRouterPortForm(); // 重置表单
-          getRouterPortList(); // 刷新列表
-        } else {
-          message.error(res.message);
-        }
-      });
-  } else {
-    api
-      .modifyRouter({
-        id: routerPortForm.id,
-        name: routerPortForm.name,
-        model: routerPortForm.model,
-        port_num: routerPortForm.port_num,
-        location: routerPortForm.location,
-      })
-      .then((res: ApiResponse) => {
-        if (res.code === 0) {
-          message.success("编辑成功！");
-          showRouterPortModal.value = false;
-          getRouterPortList(); // 刷新列表
-          resetRouterPortForm(); // 重置表单
-        } else {
-          message.error(res.message);
-        }
-      });
-  }
+  api
+    .modifyRouterPort({
+      id: routerPortForm.id,
+      code: routerPortForm.code,
+      start_addr: routerPortForm.start_addr,
+      end_addr: routerPortForm.end_addr,
+      mask: routerPortForm.mask,
+      gateway: routerPortForm.gateway,
+      dns: routerPortForm.dns,
+    })
+    .then((res: ApiResponse) => {
+      if (res.code === 0) {
+        message.success("创建成功！");
+        showRouterPortModal.value = false;
+        resetRouterPortForm(); // 重置表单
+        getRouterPortList(); // 刷新列表
+      } else {
+        message.error(res.message);
+      }
+    });
 };
 
 const resetRouterPortForm = () => {
   routerPortForm.id = null;
-  routerPortForm.name = "";
-  routerPortForm.model = "";
-  routerPortForm.port_num = 1;
-  routerPortForm.location = "";
+  routerPortForm.code = "";
+  routerPortForm.start_addr = "";
+  routerPortForm.end_addr = "";
+  routerPortForm.mask = "";
+  routerPortForm.gateway = "";
+  routerPortForm.dns = "";
 };
 </script>
 

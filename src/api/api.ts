@@ -185,6 +185,22 @@ const api = {
     );
     return res.data;
   },
+  routerPortDetail: async (params: object) => {
+    const res = await axiosInstance.get(
+      "/distribution/api/v1/router_port/router_port_detail/",
+      {
+        params,
+      }
+    );
+    return res.data;
+  },
+  modifyRouterPort: async (body: object) => {
+    const res = await axiosInstance.post(
+      "/distribution/api/v1/router_port/modify/",
+      body
+    );
+    return res.data;
+  },
 };
 
 export default api;
