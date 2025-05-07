@@ -100,7 +100,14 @@ const login = () => {
       localStorage.setItem("access_token", res.access);
       localStorage.setItem("refresh_token", res.refresh);
       store.dispatch("user/getLoginUser");
-      router.push("/router");
+      api.whoami().then((res: ApiResponse) => {
+        const role = res.data.role;
+        if (role === "administrator") {
+          router.push("/router");
+        } else {
+          router.push("/user/ip_address");
+        }
+      });
       message.success("登录成功");
     });
   } catch (e) {

@@ -101,8 +101,12 @@ const performSearch = (keyword: string) => {
 };
 
 const logout = () => {
-  store.dispatch("user/logout");
-  router.push("/user/login");
+  try {
+    store.dispatch("user/logout");
+    router.push("/user/login");
+  } catch (error) {
+    message.error("退出登录失败");
+  }
 };
 </script>
 

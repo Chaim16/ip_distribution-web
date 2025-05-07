@@ -224,6 +224,15 @@ const api = {
     );
     return res.data;
   },
+  getIPAddress: async (params: object) => {
+    const res = await axiosInstance.get(
+      "/distribution/api/v1/user/ip_address/",
+      {
+        params,
+      }
+    );
+    return res.data;
+  },
 };
 
 export default api;

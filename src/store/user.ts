@@ -46,6 +46,8 @@ export default {
       commit("updateUser", { username: "未登录", role: "unknown" });
       commit("setAuthenticated", false);
       localStorage.removeItem("isAuthenticated");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
     },
   },
 

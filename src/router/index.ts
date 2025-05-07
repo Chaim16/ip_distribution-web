@@ -1,11 +1,4 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import {
-  HomeOutlined,
-  SwapOutlined,
-  UserOutlined,
-  PlusOutlined,
-  ShrinkOutlined,
-} from "@ant-design/icons-vue";
 import UserRegister from "@/views/user/UserRegister.vue";
 import UserLogin from "@/views/user/UserLogin.vue";
 import { ACCESS_ENUM } from "@/utils/constant";
@@ -15,13 +8,13 @@ import WorkstationList from "@/views/WorkstationList.vue";
 import SwitchList from "@/views/SwitchList.vue";
 import RouterPortList from "@/views/RouterPortList.vue";
 import HomeView from "@/views/HomeView.vue";
+import AddressView from "@/views/AddressView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "首页",
     meta: {
-      icon: HomeOutlined,
       hideInMenu: true,
       access: ACCESS_ENUM.UNKNOWN,
     },
@@ -31,7 +24,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/router",
     name: "路由器管理",
     meta: {
-      icon: SwapOutlined,
       access: ACCESS_ENUM.ADMINISTRATOR,
     },
     component: RouterList,
@@ -49,7 +41,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/switch",
     name: "交换机管理",
     meta: {
-      icon: UserOutlined,
       access: ACCESS_ENUM.ADMINISTRATOR,
     },
     component: SwitchList,
@@ -58,7 +49,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/workstation",
     name: "工位管理",
     meta: {
-      icon: ShrinkOutlined,
       access: ACCESS_ENUM.ADMINISTRATOR,
     },
     component: WorkstationList,
@@ -67,10 +57,18 @@ const routes: Array<RouteRecordRaw> = [
     path: "/user/management",
     name: "用户管理",
     meta: {
-      icon: ShrinkOutlined,
       access: ACCESS_ENUM.ADMINISTRATOR,
     },
     component: UserManagement,
+  },
+  {
+    path: "/user/ip_address",
+    name: "地址信息",
+    component: AddressView,
+    meta: {
+      hideInMenu: false,
+      access: ACCESS_ENUM.GENERAL,
+    },
   },
   {
     path: "/user/register",
